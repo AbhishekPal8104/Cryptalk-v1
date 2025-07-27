@@ -3,10 +3,19 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
-
     "baseUrl": ".",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "customConditions": [
+      "react-native"
+    ],
     "paths": {
-      "~/*": ["src/*"]
-    }
+      "~/*": [
+        "src/*"
+      ]
+    },
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   }
 }
