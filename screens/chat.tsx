@@ -22,7 +22,7 @@ import {
     serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import { decryptMessage, encryptMessage } from 'utils/encrytion';
+import { encryptMessage, decryptMessage } from '../utils/encrytion'; // Adjust the import path as necessary
 
 interface Message {
     id: string;
@@ -50,10 +50,15 @@ const ChatScreen = () => {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedMessages = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Message[];
+            const fetchedMessages = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    senderId: typeof data.senderId === 'string' ? data.senderId : '',
+                    text: typeof data.text === 'string' ? data.text : '',
+                    createdAt: data.createdAt || null,
+                };
+            }) as Message[];
 
             setMessages(fetchedMessages);
 
@@ -68,36 +73,43 @@ const ChatScreen = () => {
     const sendMessage = async () => {
         if (!text.trim()) return;
 
-        // const encryptedText = encryptMessage(text.trim());
-        // Store the encrypted message
+        console.log('Sending message:', text);
 
-        await addDoc(collection(db, 'chats', chatId, 'messages'), {
-            text: text.trim(),
-            senderId: currentUser?.uid,
-            createdAt: serverTimestamp()
-        });
+        try {
+            const encryptedText = await encryptMessage(text.trim());
 
-        setText('');
+            console.log('Encrypted:', encryptedText);
+            console.log('Decrypted:', decryptMessage(encryptedText));
+
+            await addDoc(collection(db, 'chats', chatId, 'messages'), {
+                text: encryptedText,
+                senderId: currentUser?.uid,
+                createdAt: serverTimestamp()
+            });
+
+            setText('');
+        } catch (e) {
+            console.error('Encryption error:', e);
+        }
     };
+
 
     const renderItem = ({ item }: { item: Message }) => {
         const isSender = item.senderId === currentUser?.uid;
-        let decryptedText;
-        try {
-            decryptedText = decryptMessage(item.text);
-        } catch (e) {
-            decryptedText = item.text; // Fallback to raw text if decryption fails
-        }
-
+        const decryptedText = decryptMessage(item.text);
 
         return (
             <View
-                className={`my-1 px-3 py-2 max-w-[80%] rounded-xl ${isSender ? 'bg-blue-500 self-end' : 'bg-gray-300 self-start'}`}
+                className={`my-1 px-3 py-2 max-w-[80%] rounded-xl ${isSender ? 'bg-blue-500 self-end' : 'bg-gray-300 self-start'
+                    }`}
             >
-                <Text className={`text-sm ${isSender ? 'text-white' : 'text-black'}`}>{item.text}</Text>
+                <Text className={`text-sm ${isSender ? 'text-white' : 'text-black'}`}>
+                    {decryptedText}
+                </Text>
             </View>
         );
     };
+
 
 
     return (

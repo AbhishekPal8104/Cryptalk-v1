@@ -68,6 +68,7 @@ const LoginScreen = () => {
                             onChangeText={setEmail}
                             className="border border-gray-300 rounded-xl px-4 py-4 mb-4 bg-white text-black focus:border-gray-800"
                             placeholderTextColor="#999"
+                            autoCapitalize="none"
                         />
 
                         <TextInput
@@ -77,6 +78,7 @@ const LoginScreen = () => {
                             secureTextEntry
                             className="border border-gray-300 rounded-xl px-4 py-4 mb-6 bg-gray-50 text-gray-800 focus:border-gray-800"
                             placeholderTextColor="#999"
+                            autoCapitalize="none"
                         />
 
                         <TouchableOpacity

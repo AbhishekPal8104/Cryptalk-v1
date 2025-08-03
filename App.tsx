@@ -6,6 +6,8 @@ import RegisterScreen from './screens/register';
 import ChatListScreen from './screens/chatlist';
 import ChatScreen from './screens/chat';
 import './global.css'; // This file should have Tailwind directives
+import 'react-native-get-random-values';
+
 // import "tslib";
 
 
