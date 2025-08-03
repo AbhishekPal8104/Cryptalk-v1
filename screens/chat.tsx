@@ -22,6 +22,7 @@ import {
     serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { decryptMessage, encryptMessage } from 'utils/encrytion';
 
 interface Message {
     id: string;
@@ -67,6 +68,9 @@ const ChatScreen = () => {
     const sendMessage = async () => {
         if (!text.trim()) return;
 
+        // const encryptedText = encryptMessage(text.trim());
+        // Store the encrypted message
+
         await addDoc(collection(db, 'chats', chatId, 'messages'), {
             text: text.trim(),
             senderId: currentUser?.uid,
@@ -78,6 +82,13 @@ const ChatScreen = () => {
 
     const renderItem = ({ item }: { item: Message }) => {
         const isSender = item.senderId === currentUser?.uid;
+        let decryptedText;
+        try {
+            decryptedText = decryptMessage(item.text);
+        } catch (e) {
+            decryptedText = item.text; // Fallback to raw text if decryption fails
+        }
+
 
         return (
             <View
@@ -87,6 +98,7 @@ const ChatScreen = () => {
             </View>
         );
     };
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
