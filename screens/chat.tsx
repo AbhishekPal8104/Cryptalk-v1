@@ -10,7 +10,7 @@ import {
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -22,17 +22,19 @@ import {
     serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import { encryptMessage, decryptMessage } from '../utils/encrytion'; // Adjust the import path as necessary
+import { encryptMessage, decryptMessage } from '../utils/encrytion';
 
 interface Message {
     id: string;
     senderId: string;
     text: string;
     createdAt: any;
+    // receivedAt?: any; // Optional for received messages
 }
 
 const ChatScreen = () => {
     const route = useRoute<any>();
+    const navigation = useNavigation();
     const { recipientId, recipientName } = route.params;
     const currentUser = auth.currentUser;
     const insets = useSafeAreaInsets();
@@ -73,13 +75,8 @@ const ChatScreen = () => {
     const sendMessage = async () => {
         if (!text.trim()) return;
 
-        console.log('Sending message:', text);
-
         try {
             const encryptedText = await encryptMessage(text.trim());
-
-            console.log('Encrypted:', encryptedText);
-            console.log('Decrypted:', decryptMessage(encryptedText));
 
             await addDoc(collection(db, 'chats', chatId, 'messages'), {
                 text: encryptedText,
@@ -93,35 +90,59 @@ const ChatScreen = () => {
         }
     };
 
-
     const renderItem = ({ item }: { item: Message }) => {
         const isSender = item.senderId === currentUser?.uid;
         const decryptedText = decryptMessage(item.text);
 
+        const createdTime = item.createdAt?.toDate?.().toLocaleTimeString?.([], {
+            hour: '2-digit',
+            minute: '2-digit',
+        }) || '';
+
+        // const receivedTime = item.receivedAt?.toDate?.().toLocaleTimeString?.([], {
+        //     hour: '2-digit',
+        //     minute: '2-digit',
+        // }) || '';
+
         return (
-            <View
-                className={`my-1 px-3 py-2 max-w-[80%] rounded-xl ${isSender ? 'bg-blue-500 self-end' : 'bg-gray-300 self-start'
-                    }`}
-            >
-                <Text className={`text-sm ${isSender ? 'text-white' : 'text-black'}`}>
+            <View className={`my-1 px-3 py-2 max-w-[80%] rounded-xl ${isSender ? 'bg-blue-500 self-end' : 'bg-zinc-400 self-start'}`}>
+                <Text className={`text-base ${isSender ? 'text-white' : 'text-black'}`}>
                     {decryptedText}
                 </Text>
+                <View>
+                    <Text className={`text-[10px] ${isSender ? 'text-white/70' : 'text-black/60'}`}>
+                        {createdTime}
+                    </Text>
+                    {/* {!isSender && item.receivedAt && (
+                        <Text className="text-[10px] text-black/60">
+                            Received: {receivedTime}
+                        </Text>
+                    )} */}
+                </View>
             </View>
         );
     };
 
 
-
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            {/* Added a View inside KeyboardAvoidingView to ensure flex: 1 applies correctly */}
+        <SafeAreaView className="flex-1 bg-white">
+            {/* Header with recipient name */}
+            <View className="flex-row items-center px-4 py-3 border pt-4 mt-2 border-gray-900 bg-slate-400">
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+                <Text className="text-3xl font-semibold ml-4 text-gray-800">
+                    {recipientName}
+                </Text>
+            </View>
+
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={{ flex: 1 }}> {/* This View ensures content expands */}
+                    <View className="flex-1 bg-slate-300">
                         <FlatList
                             ref={flatListRef}
                             data={messages}
@@ -133,38 +154,23 @@ const ChatScreen = () => {
                             onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
                         />
 
-                        {/* Input Box and Send Button */}
+                        {/* Input area */}
                         <View
+                            className="flex-row items-center px-3 pt-2 border-t border-gray-900 bg-slate-700"
                             style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingHorizontal: 12,
-                                paddingTop: 10,
                                 paddingBottom: Platform.OS === 'ios' ? insets.bottom : 3,
-                                borderTopWidth: 1,
-                                borderColor: '#ccc',
-                                backgroundColor: 'white',
                             }}
                         >
                             <TextInput
                                 value={text}
                                 onChangeText={setText}
                                 placeholder="Type a message..."
-                                style={{
-                                    flex: 1,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 10,
-                                    backgroundColor: '#f0f0f0',
-                                    borderRadius: 25,
-                                    fontSize: 16,
-                                    minHeight: 50,
-                                    maxHeight: 120,
-                                }}
+                                className="flex-1 px-4 py-2 bg-slate-300 rounded-full text-base max-h-32 min-h-[50px]"
                                 multiline
                                 blurOnSubmit={false}
                                 onSubmitEditing={sendMessage}
                             />
-                            <TouchableOpacity onPress={sendMessage} style={{ marginLeft: 10 }}>
+                            <TouchableOpacity onPress={sendMessage} className="ml-3">
                                 <Ionicons name="send" size={26} color="#1E90FF" />
                             </TouchableOpacity>
                         </View>
