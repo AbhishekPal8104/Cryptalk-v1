@@ -47,7 +47,9 @@ CrypTalk is a React Native messaging application built with end-to-end in-app en
 - **/src/screens** — App screens (Login, Register, Chat, etc.)  
 - **/src/utils** — Encryption/Decryption helpers  
 - **/src/firebase.ts** — Firebase configuration  
-- **/src/App.ts** — Entry point  
+- **/src/App.ts** — Entry point
+
+---
 
 ## Set up Firebase
 
@@ -56,6 +58,8 @@ CrypTalk is a React Native messaging application built with end-to-end in-app en
 - Enable **Cloud Firestore**  
 - Copy your Firebase configuration and replace it in `firebase.ts`  
 
+---
+
 ## Encryption Details
 
 - **Algorithm:** AES-256 or RSA for secure encryption  
@@ -63,9 +67,13 @@ CrypTalk is a React Native messaging application built with end-to-end in-app en
 - Decryption happens **only on the recipient's device**  
 - No plaintext messages are stored in the database  
 
+---
+
 ## License
 
 Feel free to modify and use it for educational purposes.  
+
+---
 
 ## Author
 
