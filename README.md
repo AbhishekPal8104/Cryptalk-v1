@@ -33,46 +33,42 @@ CrypTalk is a React Native messaging application built with end-to-end in-app en
 
 ## Tech Stack
 
-- Frontend: React Native (Expo or CLI)
+- Frontend: React Native (Expo)
 - Backend and Auth: Firebase Authentication
 - Database: Cloud Firestore
-- Encryption: AES or RSA (crypto-js or custom implementation)
+- Encryption: AES or RSA (crypto-js)
 - State Management: React Hooks or Context API
 
 ---
 
 ## Project Structure
 
-/src
-├── components - Reusable UI components
-├── screens - App screens (Login, Register, Chat, etc.)
-├── utils - Encryption/Decryption helpers
-├── firebase.js - Firebase configuration
-└── App.js - Entry point
+- **/src/components** — Reusable UI components  
+- **/src/screens** — App screens (Login, Register, Chat, etc.)  
+- **/src/utils** — Encryption/Decryption helpers  
+- **/src/firebase.ts** — Firebase configuration  
+- **/src/App.ts** — Entry point  
 
-Set up Firebase
+## Set up Firebase
 
-Create a Firebase project at Firebase Console
+- Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)  
+- Enable **Authentication** (Email/Password)  
+- Enable **Cloud Firestore**  
+- Copy your Firebase configuration and replace it in `firebase.ts`  
 
-Enable Authentication (Email/Password)
+## Encryption Details
 
-Enable Cloud Firestore
+- **Algorithm:** AES-256 or RSA for secure encryption  
+- Messages are **encrypted before sending** to Firestore  
+- Decryption happens **only on the recipient's device**  
+- No plaintext messages are stored in the database  
 
-Copy your Firebase config and replace in firebase.ts
+## License
 
-Encryption Details
+Feel free to modify and use it for educational purposes.  
 
-Algorithm: AES-256 or RSA for secure encryption
+## Author
 
-Messages are encrypted before sending to Firestore
+**Abhishek Pal**  
+Frontend Developer | Cybersecurity Enthusiast  
 
-Decryption happens only on the recipient's device
-
-No plaintext messages are stored in the database
-
-Feel free to modify and use it for educational purposes.
-
-Author
-
-Abhishek Pal
-Frontend Developer | Cybersecurity Enthusiast
